@@ -1,0 +1,276 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<?xml-stylesheet type="text/xsl"
+        href="http://docbook.sourceforge.net/release/xsl/current/manpages/docbook.xsl"?>
+<!DOCTYPE refentry PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
+"http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd" [
+
+<!--
+
+`xsltproc -''-nonet \
+          -''-param man.charmap.use.subset "0" \
+          -''-param make.year.ranges "1" \
+          -''-param make.single.year.ranges "1" \
+          /usr/share/xml/docbook/stylesheet/nwalsh/manpages/docbook.xsl \
+          manpage.xml'
+
+A manual page <package>.<section> will be generated. You may view the
+manual page with: nroff -man <package>.<section> | less'. A typical entry
+in a Makefile or Makefile.am is:
+
+DB2MAN = /usr/share/sgml/docbook/stylesheet/xsl/nwalsh/manpages/docbook.xsl
+XP     = xsltproc -''-nonet -''-param man.charmap.use.subset "0"
+
+manpage.1: manpage.xml
+        $(XP) $(DB2MAN) $<
+    
+The xsltproc binary is found in the xsltproc package. The XSL files are in
+docbook-xsl. A description of the parameters you can use can be found in the
+docbook-xsl-doc-* packages. Please remember that if you create the nroff
+version in one of the debian/rules file targets (such as build), you will need
+to include xsltproc and docbook-xsl in your Build-Depends control field.
+Alternatively use the xmlto command/package. That will also automatically
+pull in xsltproc and docbook-xsl.
+
+Notes for using docbook2x: docbook2x-man does not automatically create the
+AUTHOR(S) and COPYRIGHT sections. In this case, please add them manually as
+<refsect1> ... </refsect1>.
+
+To disable the automatic creation of the AUTHOR(S) and COPYRIGHT sections
+read /usr/share/doc/docbook-xsl/doc/manpages/authors.html. This file can be
+found in the docbook-xsl-doc-html package.
+
+Validation can be done using: `xmllint -''-noout -''-valid manpage.xml`
+
+General documentation about man-pages and man-page-formatting:
+man(1), man(7), http://www.tldp.org/HOWTO/Man-Page/
+
+-->
+
+  <!-- Fill in your name for FIRSTNAME and SURNAME. -->
+  <!ENTITY dhfirstname "David">
+  <!ENTITY dhsurname   "Paleino">
+  <!-- dhusername could also be set to "&firstname; &surname;". -->  
+  <!ENTITY dhusername  "David Paleino">
+  <!ENTITY dhemail     "d.paleino@gmail.com">
+  <!-- SECTION should be 1-8, maybe w/ subsection other parameters are
+       allowed: see man(7), man(1) and
+       http://www.tldp.org/HOWTO/Man-Page/q2.html. -->
+  <!ENTITY dhsection   "1">
+  <!-- TITLE should be something like "User commands" or similar (see
+       http://www.tldp.org/HOWTO/Man-Page/q2.html). -->
+  <!ENTITY dhtitle     "Syslog-Summary User Manual">
+  <!ENTITY dhucpackage "SYSLOG-SUMMARY">
+  <!ENTITY dhpackage   "syslog-summary">
+]>
+
+<refentry>
+  <refentryinfo>
+    <title>&dhtitle;</title>
+    <productname>&dhpackage;</productname>
+    <authorgroup>
+      <author>
+       <firstname>Lars</firstname>
+        <surname>Wirzenius</surname>
+        <contrib>Wrote this manpage for the Debian system.</contrib>
+        <contrib>Wrote the first version of &dhpackage;.</contrib>
+        <contrib>Maintained the Debian package from 1998 to 2000.</contrib>
+        <address>
+          <email>liw@iki.fi</email>
+        </address>
+      </author>
+      <author>
+        <firstname>Tommi</firstname>
+        <surname>Virtanen</surname>
+        <contrib>Maintained the package from 2001 to early 2008.</contrib>
+        <address>
+          <email>tv@debian.org</email>
+        </address>
+      </author>
+      <author>
+        <firstname>David</firstname>
+        <surname>Paleino</surname>
+        <contrib>Maintains the package since early 2008.</contrib>
+        <address>
+          <email>d.paleino@gmail.com</email>
+        </address>
+      </author>
+    </authorgroup>
+    <copyright>
+      <year>2008</year>
+      <holder>David Paleino</holder>
+    </copyright>
+    <copyright>
+      <year>2001</year>
+      <year>2002</year>
+      <year>2003</year>
+      <year>2004</year>
+      <year>2005</year>
+      <year>2006</year>
+      <year>2007</year>
+      <holder>Tommi Virtanen</holder>
+    </copyright>
+    <copyright>
+      <year>1998</year>
+      <year>1999</year>
+      <year>2000</year>
+      <holder>Lars Wirzenius</holder>
+    </copyright>
+    <legalnotice>
+      <para>This manual page was written for the Debian system
+        (but may be used by others).</para>
+      <para>Permission is granted to copy, distribute and/or modify this
+        document under the terms of the GNU General Public License,
+        Version 3 or (at your option) any later version published by
+        the Free Software Foundation.</para>
+      <para>On Debian systems, the complete text of the GNU General Public
+        License can be found in
+	<filename>/usr/share/common-licenses/GPL</filename>.</para>
+    </legalnotice>
+  </refentryinfo>
+  <refmeta>
+    <refentrytitle>&dhucpackage;</refentrytitle>
+    <manvolnum>&dhsection;</manvolnum>
+  </refmeta>
+  <refnamediv>
+    <refname>&dhpackage;</refname>
+    <refpurpose>summarize the contents of a syslog log file</refpurpose>
+  </refnamediv>
+  <refsynopsisdiv>
+    <cmdsynopsis>
+      <command>&dhpackage;</command>
+      <!-- These are several examples, how syntaxes could look -->
+      <arg choice="opt">
+        <group choice="plain">
+          <arg choice="plain"><option>-s</option></arg>
+          <arg choice="plain"><option>--state=</option></arg>
+        </group>
+        <replaceable class="option">filename</replaceable>
+      </arg>
+      <arg choice="opt">
+        <group choice="plain">
+          <arg choice="plain"><option>-i</option></arg>
+          <arg choice="plain"><option>--ignore=</option></arg>
+        </group>
+        <replaceable class="option">filename</replaceable>
+      </arg>
+      <arg choice="opt">
+        <group choice="plain">
+          <arg choice="plain"><option>-d</option></arg>
+          <arg choice="plain"><option>--debug</option></arg>
+        </group>
+      </arg>
+      <arg choice="opt">
+        <group choice="plain">
+          <arg choice="plain"><option>-r</option></arg>
+          <arg choice="plain"><option>--repeat</option></arg>
+        </group>
+      </arg>
+      <arg choice="plain" rep="repeat"><replaceable>logfile</replaceable></arg>
+    </cmdsynopsis>
+    <cmdsynopsis>
+      <command>&dhpackage;</command>
+      <!-- Normally the help and version options make the programs stop
+           right after outputting the requested information. -->
+      <arg choice="opt">
+        <group choice="plain">
+          <arg choice="plain"><option>-h</option></arg>
+          <arg choice="plain"><option>--help</option></arg>
+        </group>
+      </arg>
+    </cmdsynopsis>
+  </refsynopsisdiv>
+  <refsect1 id="description">
+    <title>DESCRIPTION</title>
+    <para>This manual page documents briefly the
+      <command>&dhpackage;</command> command.</para>
+    <para><command>&dhpackage;</command> summarizes the contents of log files
+    via the
+    <citerefentry>
+      <refentrytitle>syslog</refentrytitle>
+      <manvolnum>3</manvolnum>
+    </citerefentry>
+    service, by displaying each unique (except for the time) line once, and also
+    the number of times such a line occurs in the input. The lines are displayed
+    in the order they occur in the input.</para>
+  </refsect1>
+  <refsect1 id="options">
+    <title>OPTIONS</title>
+    <variablelist>
+      <!-- Use the variablelist.term.separator and the
+           variablelist.term.break.after parameters to
+           control the term elements. -->
+      <varlistentry>
+        <term><option>-i <replaceable>filename</replaceable></option></term>
+        <term><option>--ignore=<replaceable>filename</replaceable></option></term>
+        <listitem>
+          <para>Read regular expressions from <replaceable>filename</replaceable>
+          and ignore lines in the logfiles that match them.</para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term><option>-s <replaceable>filename</replaceable></option></term>
+        <term><option>--state=<replaceable>filename</replaceable></option></term>
+        <listitem>
+          <para>Read state information from <replaceable>filename</replaceable>.
+          The state contains information about the already reported parts of a log
+          file, and prevents <command>syslog-summary</command> from reporting the
+          same things many times. This is useful when <command>syslog-summary</command>
+          is run from <command>crontab</command> every hour. The file is created,
+          if it doesn't exist already.</para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term><option>-r</option></term>
+        <term><option>--repeat</option></term>
+        <listitem>
+          <para>Merge "last message repeated * times" lines with the repeated
+          event.</para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term><option>-d</option></term>
+        <term><option>--debug</option></term>
+        <listitem>
+          <para>Enable verbose messages when errors occur (i.e. "debug mode").</para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term><option>-h</option></term>
+        <term><option>--help</option></term>
+        <listitem>
+          <para>Show summary of options.</para>
+        </listitem>
+      </varlistentry>
+    </variablelist>
+  </refsect1>
+  <refsect1 id="files">
+    <title>FILES</title>
+    <variablelist>
+      <varlistentry>
+        <term><filename>/etc/syslog-summary/ignore.rules</filename></term>
+        <listitem>
+          <para>Default ignore.rules file with default regular expressions.</para>
+        </listitem>
+      </varlistentry>
+    </variablelist>
+  </refsect1>
+  <refsect1 id="diagnostics">
+    <title>DIAGNOSTICS</title>
+    <para>When reporting a bug, please run <command>syslog-summary</command>
+    with the <option>-d</option> (or <option>--debug</option>) flag enabled.</para>
+    <para><command>&dhpackage;</command> provides some return codes, that can
+      be used in scripts:</para>
+    <segmentedlist>
+      <segtitle>Code</segtitle>
+      <segtitle>Diagnostic</segtitle>
+      <seglistitem>
+        <seg><errorcode>0</errorcode></seg>
+        <seg>Program exited successfully.</seg>
+      </seglistitem>
+      <seglistitem>
+        <seg><errorcode>1</errorcode></seg>
+        <seg>Something went wrong, please run the program with the debug messages enabled.</seg>
+      </seglistitem>
+    </segmentedlist>
+  </refsect1>
+</refentry>

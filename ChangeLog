@@ -1,0 +1,13 @@
+syslog-summary (1.14)
+
+  * Added ability to read gzip compressed files, using python-magic or, if
+    unavailable, os.path.splitext as fallback.
+  * Added this ChangeLog file to track changes made to the sourcecode.
+  * Moved regexp matching (ignore rules) earlier in the code (i.e. right
+    after reading the line).
+  * Using hashlib (Python 2.5) instead of the deprecated md5 module
+  * printable_md5() removed: using hexdigest() method of the hashlib object.
+  * Using SHA-256 instead of MD5 now.
+  * Imported into SourceForge's SVN repository.
+
+ -- David Paleino <d.paleino@gmail.com>  Sat, 26 Apr 2008 17:45:51 +0200

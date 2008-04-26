@@ -1,0 +1,310 @@
+#!/usr/bin/env python2.5
+# -*- coding: utf-8 -*-
+
+# Copyright © 2008, David Paleino <d.paleino@gmail.com>
+#           © 2001-2008, Tommi Virtanen <tv@debian.org>
+#           © 1998-2000, Lars Wirzenius <liw@iki.fi>
+# 
+#      This program is free software; you can redistribute it and/or modify
+#      it under the terms of the GNU General Public License as published by
+#      the Free Software Foundation; either version 3 of the License, or
+#      (at your option) any later version.
+#      
+#      This program is distributed in the hope that it will be useful,
+#      but WITHOUT ANY WARRANTY; without even the implied warranty of
+#      MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#      GNU General Public License for more details.
+#      
+#      You should have received a copy of the GNU General Public License
+#      along with this program; if not, write to the Free Software
+#      Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
+#      MA 02110-1301, USA.
+ 
+"""Summarize the contents of a syslog log file.
+
+The syslog(3) service writes system log messages in a certain format:
+
+	Jan 17 19:21:50 zeus kernel: klogd 1.3-3, log source = /proc/kmsg started.
+
+This program summarizes the contents of such a file, by displaying each
+unique (except for the time) line once, and also the number of times such
+a line occurs in the input. The lines are displayed in the order they occur
+in the input.
+
+Lars Wirzenius <liw@iki.fi>"""
+
+IGNORE_FILENAME = "/etc/syslog-summary/ignore"
+STATE_FILENAME = None
+REPEAT = False
+QUIET = False
+DEBUG = False
+
+version = "1.14"
+
+import sys
+import re
+import getopt
+import string
+import hashlib
+from gzip import open as gzopen
+
+datepats = [
+	re.compile(r"^(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec) [ 0-9][0-9] [ 0-9][0-9]:[0-9][0-9]:[0-9][0-9] "),
+	re.compile(r"^(Mon|Tue|Wed|Thu|Fri|Sat|Sun) (Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec) [ 0-9][0-9][0-9][0-9]:[0-9][0-9] "),
+	re.compile(r"^(Mon|Tue|Wed|Thu|Fri|Sat|Sun) (Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec) [ 0-9][0-9][0-9][0-9]:[0-9][0-9]:[0-9][0-9] "),
+]
+pidpat = re.compile(r"^([^ ]* [^ ]*)\[[0-9][0-9]*\]: ")
+repeatpat = re.compile(r"^[^ ]* last message repeated (\d+) times$")
+
+ignore_pats = []
+
+def io_error(err, filename, die=True):
+	"""Prints a nice error message, i.e. Tracebacks are ugly to end users"""
+	import os, errno, traceback
+	num = err.errno
+	# DEBUG && die ensures that if it's a non-fatal exception, we don't
+	# show all the traceback mess...
+	if DEBUG:
+		if die:
+			traceback.print_exc(file=sys.stderr)
+		else:
+			print "[E] %s [%s(%s) - %s]" % (os.strerror(num), errno.errorcode[num], num, filename)
+
+	if die:
+		sys.exit(1)
+
+def read_patterns(filename):
+	"""Reads patterns to ignore from file specified by -i | --ignore="""
+	pats = []
+	try:
+		f = open(filename, "r")
+	except IOError, e:
+		io_error(e, filename, False)
+		return []
+	for line in f:
+		rule = line.strip()
+		if rule[0:1] == "#":
+			continue
+		else:
+			pats.append(re.compile(rule))
+	f.close()
+	return pats
+
+def read_states(filename):
+	"""Reads the previous state saved into the argument of -s | --state="""
+	states = {}
+	if not filename:
+		return states
+	try:
+		f = open(filename, "r")
+	except IOError, e:
+		io_error(e, filename, False)
+		return states
+	for line in f:
+		fields = string.split(line)
+		states[fields[0]] = (string.atoi(fields[1]), fields[2])
+	f.close()
+	return states
+
+def save_states(filename, states):
+	if not filename:
+		return
+	try:
+		f = open(filename, "w")
+	except IOError, e:
+		io_error(e, filename, True)
+	for filename in states.keys():
+		value = states[filename]
+		f.write("%s %d %s\n" % (filename, value[0], value[1]))
+	f.close()
+
+def should_be_ignored(line):
+	for pat in ignore_pats:
+		if pat.search(line):
+			return 1
+	return 0
+
+def split_date(line):
+	for pat in datepats:
+		m = pat.match(line)
+		if m:
+			return line[:m.end()], line[m.end():]
+	print "line has bad date", "<" + string.rstrip(line) + ">"
+	return None, line
+
+def is_gzipped(filename):
+	"""Returns True if the filename is a gzipped compressed file"""	
+	try:
+		import magic
+		ms = magic.open(magic.MAGIC_NONE)
+		ms.load()
+		if re.search("^gzip compressed data.*", ms.file(filename)):
+			return True
+		else:
+			return False
+	except:
+		from os.path import splitext
+		
+		if not QUIET:
+			print "Using fallback detection... please install python-magic for better gzip detection."
+		
+		if splitext(filename)[1] == ".gz":
+			return True
+		else:
+			return False
+
+def summarize(filename, states):
+	counts = {}
+	order = []
+	ignored_count = 0
+	if not QUIET:
+		print "Summarizing %s" % filename
+	
+	# If the file is a gzipped log, open it
+	# using the proper function from the gzip
+	# module.
+	try:
+		if is_gzipped(filename):
+			file = gzopen(filename, "rb")
+		else:
+			file = open(filename, "r")
+	except IOError, e:
+		io_error(e, filename, True)
+		
+	linecount = 0
+
+	shaobj = hashlib.sha256()
+	if filename in states:
+		oldlines, oldsha = states[filename]
+		for i in xrange(oldlines):
+			line = file.readline()
+			shaobj.update(line)
+		print "OLD-new: %s" % shaobj.hexdigest()
+		print "OLD-file: %s" % oldsha
+		if shaobj.hexdigest() != oldsha:
+			#file.seek(0, 0)
+			file.seek(0)
+			shaobj = hashlib.sha256()
+		else:
+			linecount = oldlines
+	if not QUIET:
+		print "%8d Lines skipped (already processed)" % linecount
+
+	line = file.readline()
+	previous = None
+	print "BEFORE-while: %s" % shaobj.hexdigest()
+	foo=0
+	while line:
+		foo+=1
+		shaobj.update(line)
+		linecount += 1
+		
+		if should_be_ignored(line):
+			ignored_count += 1
+			if DEBUG:
+				print "Ignoring: %s" % line
+			line = file.readline()
+		
+		date, rest = split_date(line)
+		if date:
+			found = pidpat.search(rest)
+			if found:
+				rest = found.group(1) + ": " + rest[found.end():]
+
+		count = 1
+		repeated = None
+		if REPEAT:
+			repeated = repeatpat.search(rest)
+		if repeated and previous:
+			count = int(repeated.group(1))
+			rest = previous
+
+		if counts.has_key(rest):
+			counts[rest] = counts[rest] + count
+		else:
+			assert count == 1
+			counts[rest] = count
+			order.append(rest)
+
+		if not repeated:
+			previous = rest
+		line = file.readline()
+	file.close()
+
+	print "TOT-lines: %d" % linecount
+	print "TOT-ignor: %d" % ignored_count
+	print "AFTER-while: %s" % shaobj.hexdigest()
+	print foo
+	states[filename] = (linecount + ignored_count, shaobj.hexdigest())
+	print states
+	
+	if QUIET and order:
+		print "Summarizing %s" % filename
+	if not QUIET or order:
+		print "%8d Patterns to ignore" % len(ignore_pats)
+		print "%8d Ignored lines" % ignored_count
+	for rest in order:
+		print "%8d %s" % (counts[rest], rest),
+	if not QUIET or order:
+		print
+
+def show_usage(opt = ""):
+	print """Syslog-Summary %s
+Usage: syslog-summary [options] <logfile> [<logfile> ...]
+
+Options available:
+
+-i <arg>
+--ignore=<arg>     read regular expressions from <arg>, and ignore lines in the
+                   <logfile> that match them
+-s <arg>
+--state=<arg>      read state information from filename (see the man page)
+-r
+--repeat           merge "last message repeated x times" with the event repeated
+-q
+--quiet            don't output anything, unless there were unmatched lines
+-d
+--debug            shows additional messages in case of error
+-h
+--help             show this help message and exit
+
+This program must be run with proper privileges to read log files!""" % version
+	
+	if opt:
+		print "Option \"%s\" not recognized." % opt
+	
+	sys.exit(0)
+
+def main():
+	global ignore_pats, IGNORE_FILENAME, STATE_FILENAME, REPEAT, QUIET, DEBUG
+
+	opts, args = getopt.getopt(sys.argv[1:], "i:qs:rhd", [
+		"ignore=", "quiet", "state=", "repeat", "help", "debug" ])
+
+	if len(sys.argv) == 1:
+		show_usage()
+	
+	for opt, optarg in opts:
+		if opt == "-i" or opt == "--ignore":
+			IGNORE_FILENAME = optarg
+		elif opt == "-s" or opt == "--state":
+			STATE_FILENAME = optarg
+		elif opt == "-r" or opt == "--repeat":
+			REPEAT = True
+		elif opt == "-q" or opt == "--quiet":
+			QUIET = True
+		elif opt == "-h" or opt == "--help":
+			show_usage()
+		elif opt == "-d" or opt == "--debug":
+			DEBUG = True
+		else:
+			show_usage(opt)
+
+	ignore_pats = read_patterns(IGNORE_FILENAME)
+	states = read_states(STATE_FILENAME)
+	for filename in args:
+		summarize(filename, states)
+	save_states(STATE_FILENAME, states)
+
+if __name__ == "__main__":
+	main()

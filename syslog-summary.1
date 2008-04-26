@@ -1,0 +1,137 @@
+.\"     Title: SYSLOG-SUMMARY
+.\"    Author: Lars Wirzenius <liw@iki.fi>
+.\" Generator: DocBook XSL Stylesheets v1.73.2 <http://docbook.sf.net/>
+.\"      Date: 02/07/2008
+.\"    Manual: Syslog-Summary User Manual
+.\"    Source: syslog-summary
+.\"
+.TH "SYSLOG\-SUMMARY" "1" "02/07/2008" "syslog-summary" "Syslog-Summary User Manual"
+.\" disable hyphenation
+.nh
+.\" disable justification (adjust text to left margin only)
+.ad l
+.SH "NAME"
+syslog-summary - summarize the contents of a syslog log file
+.SH "SYNOPSIS"
+.HP 15
+\fBsyslog\-summary\fR [\fB\-s\fR\ |\ \fB\-\-state=\fR\ \fIfilename\fR] [\fB\-i\fR\ |\ \fB\-\-ignore=\fR\ \fIfilename\fR] [\fB\-d\fR\ |\ \fB\-\-debug\fR] [\fB\-r\fR\ |\ \fB\-\-repeat\fR] \fIlogfile\fR...
+.HP 15
+\fBsyslog\-summary\fR [\fB\-h\fR\ |\ \fB\-\-help\fR]
+.SH "DESCRIPTION"
+.PP
+This manual page documents briefly the
+\fBsyslog\-summary\fR
+command\.
+.PP
+\fBsyslog\-summary\fR
+summarizes the contents of log files via the
+\fBsyslog\fR(3)
+service, by displaying each unique (except for the time) line once, and also the number of times such a line occurs in the input\. The lines are displayed in the order they occur in the input\.
+.SH "OPTIONS"
+.PP
+\fB\-i \fR\fB\fIfilename\fR\fR, \fB\-\-ignore=\fR\fB\fIfilename\fR\fR
+.RS 4
+Read regular expressions from
+\fIfilename\fR
+and ignore lines in the logfiles that match them\.
+.RE
+.PP
+\fB\-s \fR\fB\fIfilename\fR\fR, \fB\-\-state=\fR\fB\fIfilename\fR\fR
+.RS 4
+Read state information from
+\fIfilename\fR\. The state contains information about the already reported parts of a log file, and prevents
+\fBsyslog\-summary\fR
+from reporting the same things many times\. This is useful when
+\fBsyslog\-summary\fR
+is run from
+\fBcrontab\fR
+every hour\. The file is created, if it doesn\'t exist already\.
+.RE
+.PP
+\fB\-r\fR, \fB\-\-repeat\fR
+.RS 4
+Merge "last message repeated * times" lines with the repeated event\.
+.RE
+.PP
+\fB\-d\fR, \fB\-\-debug\fR
+.RS 4
+Enable verbose messages when errors occur (i\.e\. "debug mode")\.
+.RE
+.PP
+\fB\-h\fR, \fB\-\-help\fR
+.RS 4
+Show summary of options\.
+.RE
+.SH "FILES"
+.PP
+\fI/etc/syslog\-summary/ignore\.rules\fR
+.RS 4
+Default ignore\.rules file with default regular expressions\.
+.RE
+.SH "DIAGNOSTICS"
+.PP
+When reporting a bug, please run
+\fBsyslog\-summary\fR
+with the
+\fB\-d\fR
+(or
+\fB\-\-debug\fR) flag enabled\.
+.PP
+\fBsyslog\-summary\fR
+provides some return codes, that can be used in scripts:
+.\" line length increase to cope w/ tbl weirdness
+.ll +(\n(LLu * 62u / 100u)
+.TS
+ll.
+\fICode\fR	\fIDiagnostic\fR
+T{
+\fB0\fR
+T}	T{
+Program exited successfully\.
+T}
+T{
+\fB1\fR
+T}	T{
+Something went wrong, please run the program with the debug messages enabled\.
+T}
+.TE
+.\" line length decrease back to previous value
+.ll -(\n(LLu * 62u / 100u)
+.sp
+.SH "AUTHORS"
+.PP
+\fBLars Wirzenius\fR <\&liw@iki\.fi\&>
+.sp -1n
+.IP "" 4
+Wrote this manpage for the Debian system\.
+.sp -1n
+.IP "" 4
+Wrote the first version of syslog\-summary\.
+.sp -1n
+.IP "" 4
+Maintained the Debian package from 1998 to 2000\.
+.PP
+\fBTommi Virtanen\fR <\&tv@debian\.org\&>
+.sp -1n
+.IP "" 4
+Maintained the package from 2001 to early 2008\.
+.PP
+\fBDavid Paleino\fR <\&d\.paleino@gmail\.com\&>
+.sp -1n
+.IP "" 4
+Maintains the package since early 2008\.
+.SH "COPYRIGHT"
+Copyright \(co 2008 David Paleino
+.br
+Copyright \(co 2001-2007 Tommi Virtanen
+.br
+Copyright \(co 1998-2000 Lars Wirzenius
+.br
+.PP
+This manual page was written for the Debian system (but may be used by others)\.
+.PP
+Permission is granted to copy, distribute and/or modify this document under the terms of the GNU General Public License, Version 3 or (at your option) any later version published by the Free Software Foundation\.
+.PP
+On Debian systems, the complete text of the GNU General Public License can be found in
+\fI/usr/share/common\-licenses/GPL\fR\.
+.sp
