@@ -9,5 +9,6 @@ syslog-summary (1.14)
   * printable_md5() removed: using hexdigest() method of the hashlib object.
   * Using SHA-256 instead of MD5 now.
   * Imported into SourceForge's SVN repository.
+  * Added rule to make a tarball to release :)
 
- -- David Paleino <d.paleino@gmail.com>  Sat, 26 Apr 2008 17:45:51 +0200
+ -- David Paleino <d.paleino@gmail.com>  Sat, 06 Jun 2009 15:49:08 +0200

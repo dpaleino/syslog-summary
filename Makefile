@@ -3,6 +3,8 @@ XP = xsltproc --nonet \
 				--param make.year.ranges "1" \
 				--param make.single.year.ranges "1"
 
+version = $(shell grep ^version syslog-summary | cut -d\" -f2)
+
 install:
 	install -m 755 syslog-summary $(DESTDIR)/usr/bin/syslog-summary
 	install -m 644 ignore.rules $(DESTDIR)/etc/syslog-summary/ignore.rules
@@ -14,3 +16,13 @@ uninstall:
 syslog-summary.1: syslog-summary.1.xml
 	$(XP) $<
 
+dist: clean
+	mkdir syslog-summary-$(version)/
+	find . -maxdepth 1 -type f | xargs cp -t syslog-summary-$(version)/
+	@rm -rf syslog-summary-$(version)/.git/
+	tar zcf syslog-summary-$(version).tar.gz syslog-summary-$(version)/
+	rm -rf syslog-summary-$(version)/
+
+clean:
+	@find . -type d -name "syslog-summary-*" | xargs rm -rf
+	@find . -type f -name "*.tar.gz" -delete
