@@ -1,1 +1,10 @@
-Still to be written, sorry :(
+syslog-summary
+==============
+
+This program summarizes the contents of a log file written by syslog,
+by displaying each unique (except for the time) line once, and also
+the number of times such a line occurs in the input. The lines are
+displayed in the order they occur in the input.
+
+It is also possible to define some "ignore rules" using regular
+expressions.
