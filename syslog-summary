@@ -43,10 +43,7 @@ DEBUG = False
 
 version = "1.14"
 
-import sys
-import re
-import getopt
-import string
+import sys, re, getopt, string
 from gzip import open as gzopen
 from hashlib import sha1
 
