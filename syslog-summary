@@ -35,17 +35,12 @@ Lars Wirzenius <liw@iki.fi>
 Tommi Virtanen <tv@debian.org>
 David Paleino <d.paleino@gmail.com>"""
 
-IGNORE_FILENAME = "/etc/syslog-summary/ignore"
-STATE_FILENAME = None
-REPEAT = False
-QUIET = False
-DEBUG = False
-
 version = "1.14"
 
 import sys, re, getopt, string
 from gzip import open as gzopen
 from hashlib import sha1
+from optparse import OptionParser
 
 datepats = [
 	re.compile(r"^(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec) [ 0-9][0-9] [ 0-9][0-9]:[0-9][0-9]:[0-9][0-9] "),
@@ -247,57 +242,35 @@ def summarize(filename, states):
 	if not QUIET or order:
 		print
 
-def show_usage(opt = ""):
-	print """Syslog-Summary %s
-Usage: syslog-summary [options] <logfile> [<logfile> ...]
-
-Options available:
-
--i <arg>
---ignore=<arg>     read regular expressions from <arg>, and ignore lines in the
-                   <logfile> that match them
--s <arg>
---state=<arg>      read state information from filename (see the man page)
--r
---repeat           merge "last message repeated x times" with the event repeated
--q
---quiet            don't output anything, unless there were unmatched lines
--d
---debug            shows additional messages in case of error
--h
---help             show this help message and exit
-
-This program must be run with proper privileges to read log files!""" % version
-	
-	if opt:
-		print "Option \"%s\" not recognized." % opt
-	
-	sys.exit(0)
-
 def main():
 	global ignore_pats, IGNORE_FILENAME, STATE_FILENAME, REPEAT, QUIET, DEBUG
 
-	opts, args = getopt.getopt(sys.argv[1:], "i:qs:rhd", [
-		"ignore=", "quiet", "state=", "repeat", "help", "debug" ])
+	parser = OptionParser(usage="%prog [options] <logfile> [<logfile> ...]",
+	                      version="%%prog %s" % version,
+	                      description="Summarize the contents of a syslog log file")
+	parser.add_option("-i", "--ignore", dest="ignorefile", default="/etc/syslog-summary/ignore",
+	                  help="read regular expressions from <file>, and ignore lines in the <logfile> that match them",
+	                  metavar="<file>")
+	parser.add_option("-s", "--state", dest="statefile",
+	                  help="read state information from <file> (see the man page)",
+	                  metavar="<file>")
+	parser.add_option("-r", "--repeat", action="store_true", dest="repeat", default=False,
+	                  help="merge \"last message repeated x times\" with the event repeated")
+	parser.add_option("-q", "--quiet", action="store_true", dest="quiet", default=False,
+	                  help="don't output anything, unless there were unmatched lines")
+	parser.add_option("-d", "--debug", action="store_true", dest="debug", default=False,
+	                  help="shows additional messages in case of error")
+
+	(options, args) = parser.parse_args()
 
 	if len(sys.argv) == 1:
-		show_usage()
-	
-	for opt, optarg in opts:
-		if opt == "-i" or opt == "--ignore":
-			IGNORE_FILENAME = optarg
-		elif opt == "-s" or opt == "--state":
-			STATE_FILENAME = optarg
-		elif opt == "-r" or opt == "--repeat":
-			REPEAT = True
-		elif opt == "-q" or opt == "--quiet":
-			QUIET = True
-		elif opt == "-h" or opt == "--help":
-			show_usage()
-		elif opt == "-d" or opt == "--debug":
-			DEBUG = True
-		else:
-			show_usage(opt)
+		parser.error("no logfile specified")
+
+	IGNORE_FILENAME = options.ignorefile
+	STATE_FILENAME = options.statefile
+	REPEAT = options.repeat
+	QUIET = options.quiet
+	DEBUG = options.debug
 
 	ignore_pats = read_patterns(IGNORE_FILENAME)
 	states = read_states(STATE_FILENAME)
