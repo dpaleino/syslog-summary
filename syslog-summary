@@ -178,8 +178,8 @@ def summarize(filename, states):
 		for i in xrange(oldlines):
 			line = file.readline()
 			shaobj.update(line)
-		print "OLD-new: %s" % shaobj.hexdigest()
-		print "OLD-file: %s" % oldsha
+#		print "OLD-new: %s" % shaobj.hexdigest()
+#		print "OLD-file: %s" % oldsha
 		if shaobj.hexdigest() != oldsha:
 			#file.seek(0, 0)
 			file.seek(0)
@@ -191,10 +191,10 @@ def summarize(filename, states):
 
 	line = file.readline()
 	previous = None
-	print "BEFORE-while: %s" % shaobj.hexdigest()
+#	print "BEFORE-while: %s" % shaobj.hexdigest()
 	foo=0
 	while line:
-		foo+=1
+#		foo+=1
 		shaobj.update(line)
 		linecount += 1
 		
@@ -230,12 +230,12 @@ def summarize(filename, states):
 		line = file.readline()
 	file.close()
 
-	print "TOT-lines: %d" % linecount
-	print "TOT-ignor: %d" % ignored_count
-	print "AFTER-while: %s" % shaobj.hexdigest()
-	print foo
+#	print "TOT-lines: %d" % linecount
+#	print "TOT-ignor: %d" % ignored_count
+#	print "AFTER-while: %s" % shaobj.hexdigest()
+#	print foo
 	states[filename] = (linecount + ignored_count, shaobj.hexdigest())
-	print states
+#	print states
 	
 	if QUIET and order:
 		print "Summarizing %s" % filename
