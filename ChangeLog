@@ -8,7 +8,7 @@ syslog-summary (1.14)
   * Using hashlib (Python 2.5) instead of the deprecated md5 module
   * printable_md5() removed: using hexdigest() method of the hashlib object.
   * Using SHA-1 instead of MD5 now.
-  * Imported into SourceForge's SVN repository.
   * Added rule to make a tarball to release :)
+  * Code moved to GitHub, project management to Launchpad.
 
- -- David Paleino <d.paleino@gmail.com>  Sat, 06 Jun 2009 15:49:08 +0200
+ -- David Paleino <d.paleino@gmail.com>  Thu, 17 Sep 2009 12:18:28 +0200
