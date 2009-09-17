@@ -47,8 +47,8 @@ import sys
 import re
 import getopt
 import string
-import hashlib
 from gzip import open as gzopen
+from hashlib import sha1
 
 datepats = [
 	re.compile(r"^(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec) [ 0-9][0-9] [ 0-9][0-9]:[0-9][0-9]:[0-9][0-9] "),
@@ -175,7 +175,7 @@ def summarize(filename, states):
 		
 	linecount = 0
 
-	shaobj = hashlib.sha256()
+	shaobj = sha1()
 	if filename in states:
 		oldlines, oldsha = states[filename]
 		for i in xrange(oldlines):
@@ -186,7 +186,7 @@ def summarize(filename, states):
 		if shaobj.hexdigest() != oldsha:
 			#file.seek(0, 0)
 			file.seek(0)
-			shaobj = hashlib.sha256()
+			shaobj = sha1()
 		else:
 			linecount = oldlines
 	if not QUIET:
