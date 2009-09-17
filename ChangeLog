@@ -1,3 +1,10 @@
+syslog-summary (1.15) UNRELEASED
+
+  * Fix Makefile so that it creates the needed directories before
+    actually trying to install anything in them.
+
+ -- David Paleino <d.paleino@gmail.com>  #DATE#
+
 syslog-summary (1.14)
 
   * Added ability to read gzip compressed files, using python-magic or, if

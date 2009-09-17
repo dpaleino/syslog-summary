@@ -6,6 +6,8 @@ XP = xsltproc --nonet \
 version = $(shell grep ^version syslog-summary | cut -d\" -f2)
 
 install:
+	mkdir -p $(DESTDIR)/usr/bin/
+	mkdir -p $(DESTDIR)/etc/syslog-summary/
 	install -m 755 syslog-summary $(DESTDIR)/usr/bin/syslog-summary
 	install -m 644 ignore.rules $(DESTDIR)/etc/syslog-summary/ignore.rules
 
