@@ -248,7 +248,7 @@ def main():
 	parser = OptionParser(usage="%prog [options] <logfile> [<logfile> ...]",
 	                      version="%%prog %s" % version,
 	                      description="Summarize the contents of a syslog log file")
-	parser.add_option("-i", "--ignore", dest="ignorefile", default="/etc/syslog-summary/ignore",
+	parser.add_option("-i", "--ignore", dest="ignorefile", default="/etc/syslog-summary/ignore.rules",
 	                  help="read regular expressions from <file>, and ignore lines in the <logfile> that match them",
 	                  metavar="<file>")
 	parser.add_option("-s", "--state", dest="statefile",
