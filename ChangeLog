@@ -2,6 +2,7 @@ syslog-summary (1.15) UNRELEASED
 
   * Fix Makefile so that it creates the needed directories before
     actually trying to install anything in them.
+  * Don't hardcode python2.5 in the source
 
  -- David Paleino <d.paleino@gmail.com>  #DATE#
 
