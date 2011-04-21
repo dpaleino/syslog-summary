@@ -198,6 +198,7 @@ def summarize(filename, states):
 			if DEBUG:
 				print "Ignoring: %s" % line
 			line = file.readline()
+			continue
 		
 		date, rest = split_date(line)
 		if date:
