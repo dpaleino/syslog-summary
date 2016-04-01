@@ -10,6 +10,7 @@ install:
 	mkdir -p $(DESTDIR)/etc/syslog-summary/
 	install -m 755 syslog-summary $(DESTDIR)/usr/bin/syslog-summary
 	install -m 644 ignore.rules $(DESTDIR)/etc/syslog-summary/ignore.rules
+	install -m 644 dates.rules $(DESTDIR)/etc/syslog-summary/dates.rules
 
 uninstall:
 	[ ! -f $(DESTDIR)/usr/bin/syslog-summary ] || rm -v $(DESTDIR)/usr/bin/syslog-summary

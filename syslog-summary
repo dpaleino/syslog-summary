@@ -251,6 +251,9 @@ def main():
 	parser.add_option("-i", "--ignore", dest="ignorefile", default="/etc/syslog-summary/ignore.rules",
 	                  help="read regular expressions from <file>, and ignore lines in the <logfile> that match them",
 	                  metavar="<file>")
+	parser.add_option("--dates", dest="datesfile", default="/etc/syslog-summary/dates.rules",
+	                  help="read additional date patterns as regular expressions from <file>",
+	                  metavar="<file>")
 	parser.add_option("-s", "--state", dest="statefile",
 	                  help="read state information from <file> (see the man page)",
 	                  metavar="<file>")
@@ -267,12 +270,14 @@ def main():
 		parser.error("no logfile specified")
 
 	IGNORE_FILENAME = options.ignorefile
+	DATES_FILENAME = options.datesfile
 	STATE_FILENAME = options.statefile
 	REPEAT = options.repeat
 	QUIET = options.quiet
 	DEBUG = options.debug
 
 	ignore_pats = read_patterns(IGNORE_FILENAME)
+	datepats.extend(read_patterns(DATES_FILENAME))
 	states = read_states(STATE_FILENAME)
 	for filename in args:
 		summarize(filename, states)
