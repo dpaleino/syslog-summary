@@ -106,6 +106,12 @@
       </arg>
       <arg choice="opt">
         <group choice="plain">
+          <arg choice="plain"><option>--dates=</option></arg>
+        </group>
+        <replaceable class="option">filename</replaceable>
+      </arg>
+      <arg choice="opt">
+        <group choice="plain">
           <arg choice="plain"><option>-d</option></arg>
           <arg choice="plain"><option>--debug</option></arg>
         </group>
@@ -159,6 +165,12 @@
         </listitem>
       </varlistentry>
       <varlistentry>
+        <term><option>--dates=<replaceable>filename</replaceable></option></term>
+        <listitem>
+          <para>Read additional date patterns as regular expressions from <replaceable>filename</replaceable>.</para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
         <term><option>-s <replaceable>filename</replaceable></option></term>
         <term><option>--state=<replaceable>filename</replaceable></option></term>
         <listitem>
@@ -201,6 +213,12 @@
         <term><filename>/etc/syslog-summary/ignore.rules</filename></term>
         <listitem>
           <para>Default ignore.rules file with default regular expressions.</para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term><filename>/etc/syslog-summary/dates.rules</filename></term>
+        <listitem>
+          <para>Default dates.rules file with regular expressions for additional date patterns.</para>
         </listitem>
       </varlistentry>
     </variablelist>

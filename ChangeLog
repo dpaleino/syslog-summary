@@ -6,6 +6,12 @@ syslog-summary (1.15) UNRELEASED
 
  -- David Paleino <d.paleino@gmail.com>  #DATE#
 
+  * Added ability to provide additional date patterns. By default, regular
+    expressions are read from file /etc/syslog-summary/dates.rules. Custom
+    rule file may be specified via --dates=<file> option.
+
+-- Petr Gajdůšek <petr.gajdusek@egston.com> #DATE#
+
 syslog-summary (1.14)
 
   * Added ability to read gzip compressed files, using python-magic or, if
