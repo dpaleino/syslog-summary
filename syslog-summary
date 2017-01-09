@@ -197,31 +197,30 @@ def summarize(filename, states):
 			ignored_count += 1
 			if DEBUG:
 				print "Ignoring: %s" % line
-			line = file.readline()
-		
-		date, rest = split_date(line)
-		if date:
-			found = pidpat.search(rest)
-			if found:
-				rest = found.group(1) + ": " + rest[found.end():]
-
-		count = 1
-		repeated = None
-		if REPEAT:
-			repeated = repeatpat.search(rest)
-		if repeated and previous:
-			count = int(repeated.group(1))
-			rest = previous
-
-		if counts.has_key(rest):
-			counts[rest] = counts[rest] + count
 		else:
-			assert count == 1
-			counts[rest] = count
-			order.append(rest)
-
-		if not repeated:
-			previous = rest
+			date, rest = split_date(line)
+			if date:
+				found = pidpat.search(rest)
+				if found:
+					rest = found.group(1) + ": " + rest[found.end():]
+	
+			count = 1
+			repeated = None
+			if REPEAT:
+				repeated = repeatpat.search(rest)
+			if repeated and previous:
+				count = int(repeated.group(1))
+				rest = previous
+	
+			if counts.has_key(rest):
+				counts[rest] = counts[rest] + count
+			else:
+				assert count == 1
+				counts[rest] = count
+				order.append(rest)
+	
+			if not repeated:
+				previous = rest
 		line = file.readline()
 	file.close()
 
